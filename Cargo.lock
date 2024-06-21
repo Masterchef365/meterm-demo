@@ -192,6 +192,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "egui_demo_lib"
+version = "0.27.2"
+source = "git+https://github.com/Masterchef365/egui.git?branch=no-usize-in-interface#5a08e80b65b6e887f5afa6a2aa06d48b2a0a6fce"
+dependencies = [
+ "egui",
+ "egui_extras",
+ "egui_plot",
+ "log",
+ "unicode_names2",
+]
+
+[[package]]
 name = "egui_extras"
 version = "0.27.2"
 source = "git+https://github.com/Masterchef365/egui.git?branch=no-usize-in-interface#5a08e80b65b6e887f5afa6a2aa06d48b2a0a6fce"
@@ -201,6 +213,14 @@ dependencies = [
  "log",
  "mime_guess2",
  "serde",
+]
+
+[[package]]
+name = "egui_plot"
+version = "0.27.2"
+source = "git+https://github.com/Masterchef365/egui.git?branch=no-usize-in-interface#5a08e80b65b6e887f5afa6a2aa06d48b2a0a6fce"
+dependencies = [
+ "egui",
 ]
 
 [[package]]
@@ -418,6 +438,7 @@ dependencies = [
 name = "meterm-demo"
 version = "0.1.0"
 dependencies = [
+ "egui_demo_lib",
  "egui_extras",
  "metacontrols-server",
 ]
@@ -802,6 +823,12 @@ name = "unicode-ident"
 version = "1.0.12"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3354b9ac3fae1ff6755cb6db53683adb661634f67557942dea4facebec0fee4b"
+
+[[package]]
+name = "unicode_names2"
+version = "0.6.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "446c96c6dd42604779487f0a981060717156648c1706aa1f464677f03c6cc059"
 
 [[package]]
 name = "utf-8"

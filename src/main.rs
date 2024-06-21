@@ -1,6 +1,7 @@
 use std::{sync::Arc, time::Instant};
 
 mod paint;
+use egui_demo_lib::DemoWindows;
 use paint::*;
 
 use metacontrols_server::{
@@ -38,13 +39,19 @@ enum Tab {
     #[default]
     Paint,
     Text,
+    Demo,
 }
 
-#[derive(Default, Clone)]
+#[derive(Default)]
 struct ClientData {
     tab: Tab,
     paint: PaintClientData,
+    demo: DemoWindows,
 }
+
+// I'm sure this is fine :)
+unsafe impl Send for ClientData {}
+unsafe impl Sync for ClientData {}
 
 impl App {
     pub fn new() -> Self {
@@ -63,12 +70,14 @@ impl App {
             ui.horizontal(|ui| {
                 ui.selectable_value(&mut client_stuff.tab, Tab::Paint, "Paint");
                 ui.selectable_value(&mut client_stuff.tab, Tab::Text, "Text");
+                ui.selectable_value(&mut client_stuff.tab, Tab::Demo, "Egui Demo");
             });
         });
 
         match client_stuff.tab {
             Tab::Paint => paint(ctx, &mut client_stuff.paint, &mut self.paint),
             Tab::Text => other(ctx, &mut self.text),
+            Tab::Demo => client_stuff.demo.ui(ctx),
         }
     }
 }
