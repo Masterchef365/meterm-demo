@@ -5,3 +5,4 @@ edition = "2021"
 
 [dependencies]
 metacontrols-server = { git = "https://github.com/Masterchef365/meterm.git", branch = "main" }
+egui_extras = { git = "https://github.com/Masterchef365/egui.git", branch = "no-usize-in-interface" }

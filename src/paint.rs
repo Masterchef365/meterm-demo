@@ -1,6 +1,6 @@
+use egui_extras::Column;
 use metacontrols_server::egui::{
-    ahash::HashMap, CentralPanel, Color32, Context, DragValue, Frame, Pos2, Sense, Shape,
-    SidePanel, Stroke, Ui,
+    ahash::HashMap, CentralPanel, Color32, Context, DragValue, Frame, Pos2, Rect, Rounding, Sense, Shape, SidePanel, Stroke, Ui
 };
 
 #[derive(Clone)]
@@ -18,7 +18,7 @@ struct Pen {
 #[derive(Default)]
 pub struct PaintServerData {
     /// All completed drawings
-    completed: Vec<Shape>,
+    completed: Vec<Drawing>,
     /// Exactly one drawing per client
     in_progress: Vec<Drawing>,
 }
@@ -37,9 +37,15 @@ pub fn paint(ctx: &Context, client: &mut PaintClientData, server: &mut PaintServ
         ret
     });
 
+    let mut hover_rect = None;
+
     SidePanel::left("Config").show(ctx, |ui| {
+        ui.label("Pen");
         for pen in &mut client.palette {
-            ui.color_edit_button_srgba(&mut pen.stroke.color);
+            ui.horizontal(|ui| {
+                ui.label("Color: ");
+                ui.color_edit_button_srgba(&mut pen.stroke.color);
+            });
             ui.add(
                 DragValue::new(&mut pen.stroke.width)
                     .speed(1e-2)
@@ -48,6 +54,50 @@ pub fn paint(ctx: &Context, client: &mut PaintClientData, server: &mut PaintServ
                     .suffix(" px"),
             );
         }
+        ui.separator();
+
+        ui.label("Scribbles");
+        let table = egui_extras::TableBuilder::new(ui)
+            .striped(true)
+            .sense(Sense::click())
+            .column(Column::auto())
+            .column(Column::remainder());
+
+        table.header(20.0, |mut header| {
+            header.col(|ui| {
+                ui.strong("Index");
+            });
+            header.col(|ui| {
+                ui.strong("Controls");
+            });
+        }).body(|mut body| {
+            let mut do_delete = None;
+            for (idx, shape) in server.completed.iter().enumerate() {
+                body.row(18.0, |mut row| {
+                    row.col(|ui| {
+                        ui.label(format!("{}", idx));
+                    });
+                    row.col(|ui| {
+                        let resp = ui.button("Delete");
+                        if resp.clicked() {
+                            do_delete = Some(idx);
+                        }
+                        if resp.hovered() {
+                            let mut rect = Rect::NOTHING;
+                            for pos in &shape.points {
+                                rect.max = rect.max.max(*pos);
+                                rect.min = rect.min.min(*pos);
+                            }
+
+                            hover_rect = Some((rect, shape.pen.stroke));
+                        }
+                    });
+                });
+            }
+            if let Some(idx) = do_delete {
+                server.completed.remove(idx);
+            }
+        });
     });
 
     CentralPanel::default().show(ctx, |ui| {
@@ -65,7 +115,7 @@ pub fn paint(ctx: &Context, client: &mut PaintClientData, server: &mut PaintServ
 
             if resp.drag_stopped() {
                 let drawing = std::mem::take(&mut server.in_progress[client_id]);
-                server.completed.push(drawing.into());
+                server.completed.push(drawing);
             }
 
             // Display
@@ -75,6 +125,11 @@ pub fn paint(ctx: &Context, client: &mut PaintClientData, server: &mut PaintServ
 
             for shape in &server.completed {
                 ui.painter().add(shape.clone());
+            }
+
+            // Extra graphics
+            if let Some((rect, stroke)) = hover_rect {
+                ui.painter().rect_stroke(rect, Rounding::ZERO, stroke);
             }
         });
     });
