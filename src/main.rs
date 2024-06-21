@@ -1,7 +1,7 @@
 use std::{sync::Arc, time::Instant};
 
 use metacontrols_server::{
-    egui::{mutex::Mutex, CentralPanel, Context, Id, Ui},
+    egui::{mutex::Mutex, CentralPanel, Context, Id, TopBottomPanel, Ui},
     Server,
 };
 
@@ -48,19 +48,21 @@ impl App {
     }
 
     pub fn run(&mut self, ctx: &Context) {
-        CentralPanel::default().show(ctx, |ui| {
-            // Get client data
-            let client_stuff = ctx.data_mut(|mem| {
-                mem.get_temp_mut_or_default::<Arc<Mutex<ClientData>>>(Id::new("client_stuff"))
-                    .clone()
-            });
-            let mut client_stuff = client_stuff.lock();
+        // Get client data
+        let client_stuff = ctx.data_mut(|mem| {
+            mem.get_temp_mut_or_default::<Arc<Mutex<ClientData>>>(Id::new("client_stuff"))
+                .clone()
+        });
+        let mut client_stuff = client_stuff.lock();
 
+        TopBottomPanel::top("top_panel").show(ctx, |ui|{
             ui.horizontal(|ui| {
                 ui.selectable_value(&mut client_stuff.tab, Tab::Paint, "Paint");
                 ui.selectable_value(&mut client_stuff.tab, Tab::OtherTest, "Test");
             });
+        });
 
+        CentralPanel::default().show(ctx, |ui| {
             match client_stuff.tab {
                 Tab::Paint => paint(ui, &mut client_stuff.paint, &mut self.paint),
                 Tab::OtherTest => other(ui),
