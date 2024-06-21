@@ -4,7 +4,7 @@ mod paint;
 use paint::*;
 
 use metacontrols_server::{
-    egui::{mutex::Mutex, CentralPanel, Context, Id, TopBottomPanel, Ui},
+    egui::{mutex::Mutex, CentralPanel, Context, Id, ScrollArea, TextEdit, TopBottomPanel, Ui},
     Server,
 };
 
@@ -30,13 +30,14 @@ fn main() {
 #[derive(Default)]
 struct App {
     paint: PaintServerData,
+    text: String,
 }
 
 #[derive(Default, Copy, Clone, PartialEq, Eq)]
 enum Tab {
     #[default]
     Paint,
-    OtherTest,
+    Text,
 }
 
 #[derive(Default, Clone)]
@@ -61,21 +62,22 @@ impl App {
         TopBottomPanel::top("top_panel").show(ctx, |ui|{
             ui.horizontal(|ui| {
                 ui.selectable_value(&mut client_stuff.tab, Tab::Paint, "Paint");
-                ui.selectable_value(&mut client_stuff.tab, Tab::OtherTest, "Test");
+                ui.selectable_value(&mut client_stuff.tab, Tab::Text, "Text");
             });
         });
 
-        CentralPanel::default().show(ctx, |ui| {
-            match client_stuff.tab {
-                Tab::Paint => paint(ctx, &mut client_stuff.paint, &mut self.paint),
-                Tab::OtherTest => other(ctx),
-            }
-        });
+        match client_stuff.tab {
+            Tab::Paint => paint(ctx, &mut client_stuff.paint, &mut self.paint),
+            Tab::Text => other(ctx, &mut self.text),
+        }
     }
 }
 
-pub fn other(ctx: &Context) {
-
-    //ui.label("Other stuff");
+pub fn other(ctx: &Context, text: &mut String) {
+    CentralPanel::default().show(ctx, |ui| {
+        ScrollArea::vertical().show(ui, |ui| {
+            ui.add(TextEdit::multiline(text).min_size(ui.available_size()));
+        });
+    });
 }
 
