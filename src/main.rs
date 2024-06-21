@@ -1,7 +1,7 @@
-use std::time::Instant;
+use std::{sync::Arc, time::Instant};
 
 use metacontrols_server::{
-    egui::{CentralPanel, Context, Id},
+    egui::{mutex::Mutex, CentralPanel, Context, Id, Ui},
     Server,
 };
 
@@ -24,26 +24,63 @@ fn main() {
     }
 }
 
+#[derive(Default)]
 struct App {
-    client_counter: usize,
+    paint: PaintSeverData,
+}
+
+#[derive(Default, Copy, Clone, PartialEq, Eq)]
+enum Tab {
+    #[default]
+    Paint,
+    OtherTest,
+}
+
+#[derive(Default, Clone)]
+struct ClientData {
+    tab: Tab,
+    paint: PaintClientData,
 }
 
 impl App {
     pub fn new() -> Self {
-        Self { client_counter: 0 }
+        Default::default()
     }
 
     pub fn run(&mut self, ctx: &Context) {
-        let user_number = ctx.memory_mut(|mem| {
-            *mem.data
-                .get_temp_mut_or_insert_with(Id::new("user_number"), || {
-                    self.client_counter += 1;
-                    self.client_counter
-                })
-        });
-
         CentralPanel::default().show(ctx, |ui| {
-            ui.label(format!("Hello, client #{}", user_number));
+            // Get client data
+            let client_stuff = ctx.data_mut(|mem| {
+                mem.get_temp_mut_or_default::<Arc<Mutex<ClientData>>>(Id::new("client_stuff"))
+                    .clone()
+            });
+            let mut client_stuff = client_stuff.lock();
+
+            ui.horizontal(|ui| {
+                ui.selectable_value(&mut client_stuff.tab, Tab::Paint, "Paint");
+                ui.selectable_value(&mut client_stuff.tab, Tab::OtherTest, "Test");
+            });
+
+            match client_stuff.tab {
+                Tab::Paint => paint(ui, &mut client_stuff.paint, &mut self.paint),
+                Tab::OtherTest => other(ui),
+            }
         });
     }
+}
+
+#[derive(Default, Clone)]
+struct PaintClientData {
+}
+
+#[derive(Default)]
+struct PaintSeverData {
+}
+
+fn paint(ui: &mut Ui, client: &mut PaintClientData, server: &mut PaintSeverData) {
+    ui.label("Paint stuff");
+}
+
+fn other(ui: &mut Ui) {
+    ui.label("Other stuff");
 }
