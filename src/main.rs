@@ -10,6 +10,8 @@ use meterm_server::{
 };
 
 fn main() {
+    env_logger::try_init().unwrap();
+
     let mut server = Server::new("0.0.0.0:5000");
     let mut app = App::new();
 
