@@ -1,6 +1,7 @@
 use egui_extras::Column;
 use metacontrols_server::egui::{
-    ahash::HashMap, CentralPanel, Color32, Context, DragValue, Frame, Pos2, Rect, Rounding, Sense, Shape, SidePanel, Stroke, Ui
+    ahash::HashMap, CentralPanel, Color32, Context, DragValue, Frame, Pos2, Rect, Rounding, Sense,
+    Shape, SidePanel, Stroke, Ui,
 };
 
 #[derive(Clone)]
@@ -63,41 +64,55 @@ pub fn paint(ctx: &Context, client: &mut PaintClientData, server: &mut PaintServ
             .column(Column::auto())
             .column(Column::remainder());
 
-        table.header(20.0, |mut header| {
-            header.col(|ui| {
-                ui.strong("Index");
-            });
-            header.col(|ui| {
-                ui.strong("Controls");
-            });
-        }).body(|mut body| {
-            let mut do_delete = None;
-            for (idx, shape) in server.completed.iter().enumerate() {
-                body.row(18.0, |mut row| {
-                    row.col(|ui| {
-                        ui.label(format!("{}", idx));
-                    });
-                    row.col(|ui| {
-                        let resp = ui.button("Delete");
-                        if resp.clicked() {
-                            do_delete = Some(idx);
-                        }
-                        if resp.hovered() {
-                            let mut rect = Rect::NOTHING;
-                            for pos in &shape.points {
-                                rect.max = rect.max.max(*pos);
-                                rect.min = rect.min.min(*pos);
-                            }
-
-                            hover_rect = Some((rect, shape.pen.stroke));
-                        }
-                    });
+        table
+            .header(20.0, |mut header| {
+                header.col(|ui| {
+                    ui.strong("Index");
                 });
-            }
-            if let Some(idx) = do_delete {
-                server.completed.remove(idx);
-            }
-        });
+                header.col(|ui| {
+                    ui.strong("Controls");
+                });
+            })
+            .body(|mut body| {
+                let mut do_delete = None;
+                for (idx, shape) in server.completed.iter_mut().enumerate() {
+                    body.row(18.0, |mut row| {
+                        row.col(|ui| {
+                            ui.label(format!("{}", idx));
+                        });
+                        row.col(|ui| {
+                            ui.horizontal(|ui| {
+                                // Delete button
+                                let resp = ui.button("Delete");
+                                if resp.clicked() {
+                                    do_delete = Some(idx);
+                                }
+                                if resp.hovered() {
+                                    let mut rect = Rect::NOTHING;
+                                    for pos in &shape.points {
+                                        rect.max = rect.max.max(*pos);
+                                        rect.min = rect.min.min(*pos);
+                                    }
+
+                                    hover_rect = Some((rect, shape.pen.stroke));
+                                }
+
+                                // Edit color and stroke
+                                ui.color_edit_button_srgba(&mut shape.pen.stroke.color);
+                                ui.add(
+                                    DragValue::new(&mut shape.pen.stroke.width)
+                                        .clamp_range(0.0..=20.0)
+                                        .speed(1e-2)
+                                        .suffix(" px"),
+                                );
+                            });
+                        });
+                    });
+                }
+                if let Some(idx) = do_delete {
+                    server.completed.remove(idx);
+                }
+            });
     });
 
     CentralPanel::default().show(ctx, |ui| {
