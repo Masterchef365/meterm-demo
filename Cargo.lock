@@ -413,25 +413,13 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "78ca9ab1a0babb1e7d5695e3530886289c18cf2f87ec19a575a0abdce112e3a3"
 
 [[package]]
-name = "metacontrols-common"
+name = "meterm-common"
 version = "0.1.0"
-source = "git+https://github.com/Masterchef365/meterm.git?branch=main#6acc3eab7a75d90158e231f05798c243ab8c36f0"
+source = "git+https://github.com/Masterchef365/meterm.git?branch=main#9ff87f3fc62cdfeb3002f6da499a5b26c7c97adc"
 dependencies = [
  "bincode",
  "egui",
  "serde",
-]
-
-[[package]]
-name = "metacontrols-server"
-version = "0.1.0"
-source = "git+https://github.com/Masterchef365/meterm.git?branch=main#6acc3eab7a75d90158e231f05798c243ab8c36f0"
-dependencies = [
- "futures-util",
- "log",
- "metacontrols-common",
- "tokio",
- "tokio-tungstenite",
 ]
 
 [[package]]
@@ -440,7 +428,19 @@ version = "0.1.0"
 dependencies = [
  "egui_demo_lib",
  "egui_extras",
- "metacontrols-server",
+ "meterm-server",
+]
+
+[[package]]
+name = "meterm-server"
+version = "0.1.0"
+source = "git+https://github.com/Masterchef365/meterm.git?branch=main#9ff87f3fc62cdfeb3002f6da499a5b26c7c97adc"
+dependencies = [
+ "futures-util",
+ "log",
+ "meterm-common",
+ "tokio",
+ "tokio-tungstenite",
 ]
 
 [[package]]

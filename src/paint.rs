@@ -1,5 +1,5 @@
 use egui_extras::Column;
-use metacontrols_server::egui::{
+use meterm_server::egui::{
     ahash::HashMap, CentralPanel, Color32, Context, DragValue, Frame, Pos2, Rect, Rounding, Sense,
     Shape, SidePanel, Stroke, Ui, Widget,
 };

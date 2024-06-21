@@ -4,7 +4,7 @@ mod paint;
 use egui_demo_lib::DemoWindows;
 use paint::*;
 
-use metacontrols_server::{
+use meterm_server::{
     egui::{mutex::Mutex, CentralPanel, Context, Id, ScrollArea, TextEdit, TopBottomPanel, Ui},
     Server,
 };
