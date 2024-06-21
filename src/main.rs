@@ -1,5 +1,8 @@
 use std::{sync::Arc, time::Instant};
 
+mod paint;
+use paint::*;
+
 use metacontrols_server::{
     egui::{mutex::Mutex, CentralPanel, Context, Id, TopBottomPanel, Ui},
     Server,
@@ -26,7 +29,7 @@ fn main() {
 
 #[derive(Default)]
 struct App {
-    paint: PaintSeverData,
+    paint: PaintServerData,
 }
 
 #[derive(Default, Copy, Clone, PartialEq, Eq)]
@@ -64,25 +67,14 @@ impl App {
 
         CentralPanel::default().show(ctx, |ui| {
             match client_stuff.tab {
-                Tab::Paint => paint(ui, &mut client_stuff.paint, &mut self.paint),
-                Tab::OtherTest => other(ui),
+                Tab::Paint => paint(ctx, &mut client_stuff.paint, &mut self.paint),
+                Tab::OtherTest => other(ctx),
             }
         });
     }
 }
 
-#[derive(Default, Clone)]
-struct PaintClientData {
+pub fn other(ctx: &Context) {
+    //ui.label("Other stuff");
 }
 
-#[derive(Default)]
-struct PaintSeverData {
-}
-
-fn paint(ui: &mut Ui, client: &mut PaintClientData, server: &mut PaintSeverData) {
-    ui.label("Paint stuff");
-}
-
-fn other(ui: &mut Ui) {
-    ui.label("Other stuff");
-}
