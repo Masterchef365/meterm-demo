@@ -42,6 +42,8 @@ pub fn paint(ctx: &Context, client: &mut PaintClientData, server: &mut PaintServ
             ui.color_edit_button_srgba(&mut pen.stroke.color);
             ui.add(
                 DragValue::new(&mut pen.stroke.width)
+                    .speed(1e-2)
+                    .clamp_range(0.0..=20.0)
                     .prefix("Line width: ")
                     .suffix(" px"),
             );
@@ -56,9 +58,9 @@ pub fn paint(ctx: &Context, client: &mut PaintClientData, server: &mut PaintServ
             if resp.dragged() {
                 server.in_progress[client_id].pen = client.palette[client.palette_select];
 
-                server.in_progress[client_id]
-                    .points
-                    .push(resp.interact_pointer_pos().unwrap());
+                if let Some(pos) = resp.interact_pointer_pos() {
+                    server.in_progress[client_id].points.push(pos);
+                }
             }
 
             if resp.drag_stopped() {
