@@ -18,7 +18,7 @@ fn main() {
     loop {
         let tick_start = Instant::now();
 
-        server.show_on_clients(|ctx| {
+        server.for_each_client(|ctx| {
             app.run(ctx);
         });
 
