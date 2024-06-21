@@ -1,7 +1,7 @@
 use egui_extras::Column;
 use metacontrols_server::egui::{
     ahash::HashMap, CentralPanel, Color32, Context, DragValue, Frame, Pos2, Rect, Rounding, Sense,
-    Shape, SidePanel, Stroke, Ui,
+    Shape, SidePanel, Stroke, Ui, Widget,
 };
 
 #[derive(Clone)]
@@ -47,13 +47,7 @@ pub fn paint(ctx: &Context, client: &mut PaintClientData, server: &mut PaintServ
                 ui.label("Color: ");
                 ui.color_edit_button_srgba(&mut pen.stroke.color);
             });
-            ui.add(
-                DragValue::new(&mut pen.stroke.width)
-                    .speed(1e-2)
-                    .clamp_range(0.0..=20.0)
-                    .prefix("Line width: ")
-                    .suffix(" px"),
-            );
+            ui.add(edit_line_width(&mut pen.stroke.width).prefix("Line width: "));
         }
         ui.separator();
 
@@ -99,12 +93,7 @@ pub fn paint(ctx: &Context, client: &mut PaintClientData, server: &mut PaintServ
 
                                 // Edit color and stroke
                                 ui.color_edit_button_srgba(&mut shape.pen.stroke.color);
-                                ui.add(
-                                    DragValue::new(&mut shape.pen.stroke.width)
-                                        .clamp_range(0.0..=20.0)
-                                        .speed(1e-2)
-                                        .suffix(" px"),
-                                );
+                                ui.add(edit_line_width(&mut shape.pen.stroke.width));
                             });
                         });
                     });
@@ -134,12 +123,13 @@ pub fn paint(ctx: &Context, client: &mut PaintClientData, server: &mut PaintServ
             }
 
             // Display
-            for prog in &server.in_progress {
-                ui.painter().add(prog.clone());
-            }
-
+            ui.set_clip_rect(resp.rect);
             for shape in &server.completed {
                 ui.painter().add(shape.clone());
+            }
+
+            for prog in &server.in_progress {
+                ui.painter().add(prog.clone());
             }
 
             // Extra graphics
@@ -166,4 +156,13 @@ impl Default for PaintClientData {
             palette_select: 0,
         }
     }
+}
+
+fn edit_line_width(width: &mut f32) -> DragValue {
+    let speed = *width * 1e-2;
+
+    DragValue::new(width)
+        .clamp_range(0.0..=f32::INFINITY)
+        .speed(speed)
+        .suffix(" px")
 }
