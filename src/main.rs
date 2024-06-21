@@ -32,6 +32,7 @@ fn main() {
 struct App {
     paint: PaintServerData,
     text: String,
+    demo: DemoWindows,
 }
 
 #[derive(Default, Copy, Clone, PartialEq, Eq)]
@@ -40,6 +41,7 @@ enum Tab {
     Paint,
     Text,
     Demo,
+    DemoShared,
 }
 
 #[derive(Default)]
@@ -71,6 +73,7 @@ impl App {
                 ui.selectable_value(&mut client_stuff.tab, Tab::Paint, "Paint");
                 ui.selectable_value(&mut client_stuff.tab, Tab::Text, "Text");
                 ui.selectable_value(&mut client_stuff.tab, Tab::Demo, "Egui Demo");
+                ui.selectable_value(&mut client_stuff.tab, Tab::DemoShared, "Egui Demo (shared by everyone)");
             });
         });
 
@@ -78,6 +81,7 @@ impl App {
             Tab::Paint => paint(ctx, &mut client_stuff.paint, &mut self.paint),
             Tab::Text => other(ctx, &mut self.text),
             Tab::Demo => client_stuff.demo.ui(ctx),
+            Tab::DemoShared => self.demo.ui(ctx),
         }
     }
 }
