@@ -76,6 +76,7 @@ impl App {
                 ui.selectable_value(&mut client_stuff.tab, Tab::Text, "Text");
                 ui.selectable_value(&mut client_stuff.tab, Tab::Demo, "Egui Demo");
                 ui.selectable_value(&mut client_stuff.tab, Tab::DemoShared, "Egui Demo (shared by everyone)");
+                ui.hyperlink("https://github.com/Masterchef365/meterm-demo");
             });
         });
 
