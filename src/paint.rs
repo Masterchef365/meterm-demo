@@ -1,7 +1,6 @@
 use egui_extras::Column;
 use meterm_server::egui::{
-    ahash::HashMap, CentralPanel, Color32, Context, DragValue, Frame, Pos2, Rect, Rounding, Sense,
-    Shape, SidePanel, Stroke, Ui, Widget,
+    ahash::HashMap, CentralPanel, Color32, Context, CornerRadius, DragValue, Frame, Pos2, Rect, Rounding, Sense, Shape, SidePanel, Stroke, Ui, Widget
 };
 
 #[derive(Clone)]
@@ -134,7 +133,7 @@ pub fn paint(ctx: &Context, client: &mut PaintClientData, server: &mut PaintServ
 
             // Extra graphics
             if let Some((rect, stroke)) = hover_rect {
-                ui.painter().rect_stroke(rect, Rounding::ZERO, stroke);
+                ui.painter().rect_stroke(rect, CornerRadius::ZERO, stroke, meterm_server::egui::StrokeKind::Middle);
             }
         });
     });
